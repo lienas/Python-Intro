@@ -28,19 +28,19 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     city = input("Enter city name (chicago, new york city, washington): ").lower()
     while city not in CITY_DATA:
-        city = input("Invalid city: ").lower()
+        city = input("Invalid city: type one of (chicago, new york city, washington)").lower()
 
     month = input("Enter month name (all, january, february, ... , june): ").lower()
     months = ['all', 'january', 'february', 'march', 'april',
               'may', 'june']
     while month not in months:
-        month = input("Invalid month: ").lower()
+        month = input("Invalid month: type one of (all, january, february, ... , june)").lower()
 
-    day = input("Enter day of week (all, monday, tuesday, ... , sunday): ")
+    day = input("Enter day of week (all, monday, tuesday, ... , sunday): ").lower()
     days = ['all', 'monday', 'tuesday', 'wednesday',
             'thursday', 'friday', 'saturday', 'sunday']
     while day not in days:
-        day = input("Invalid day: ").lower()
+        day = input("Invalid day: type one of (all, monday, tuesday, ... , sunday)").lower()
 
     print('-'*40)
     return city, month, day
