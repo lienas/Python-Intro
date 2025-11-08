@@ -1,3 +1,10 @@
+"""Bikeshare data analysis tool.
+
+This module analyzes bikeshare data from Chicago, New York City, and Washington.
+It provides interactive filtering and statistical analysis of trip data including
+time patterns, station usage, trip duration, and user demographics.
+"""
+
 import time
 import pandas as pd
 
@@ -10,30 +17,47 @@ CITY_DATA = {
 
 
 def get_filters():
-    """Ask user to specify a city, month, and day."""
-    print('Hello! Let\'s explore some US bikeshare data!')
-    city = input("Enter city name (chicago, new york city, washington): ")
-    while city not in CITY_DATA:
-        city = input("Invalid city: ")
+    """Ask user to specify a city, month, and day to analyze.
 
-    month = input("Enter month name (all, january, february, ... , june): ")
+    Returns:
+        tuple: A tuple containing (city, month, day) as strings where:
+            city - name of the city to analyze (chicago, new york city, washington)
+            month - name of the month to filter by, or "all" for no filter
+            day - name of the day of week to filter by, or "all" for no filter
+    """
+    print('Hello! Let\'s explore some US bikeshare data!')
+    city = input("Enter city name (chicago, new york city, washington): ").lower()
+    while city not in CITY_DATA:
+        city = input("Invalid city: ").lower()
+
+    month = input("Enter month name (all, january, february, ... , june): ").lower()
     months = ['all', 'january', 'february', 'march', 'april',
               'may', 'june']
     while month not in months:
-        month = input("Invalid month: ")
+        month = input("Invalid month: ").lower()
 
     day = input("Enter day of week (all, monday, tuesday, ... , sunday): ")
     days = ['all', 'monday', 'tuesday', 'wednesday',
             'thursday', 'friday', 'saturday', 'sunday']
     while day not in days:
-        day = input("Invalid day: ")
+        day = input("Invalid day: ").lower()
 
     print('-'*40)
     return city, month, day
 
 
 def load_data(city, month, day):
-    """Load data for city and filter by month and day."""
+    """Load data for the specified city and apply month and day filters.
+
+    Args:
+        city (str): Name of the city to analyze
+        month (str): Name of the month to filter by, or "all" for no month filter
+        day (str): Name of the day of week to filter by, or "all" for no day filter
+
+    Returns:
+        pandas.DataFrame: Bikeshare data filtered by month and day with additional
+            computed columns: month, day_of_week, and hour
+    """
     df = pd.read_csv(CITY_DATA[city])
 
     start_time = pd.to_datetime(df['Start Time'])
@@ -51,7 +75,14 @@ def load_data(city, month, day):
 
 
 def time_stats(df):
-    """Display statistics on most frequent times of travel."""
+    """Display statistics on the most frequent times of travel.
+
+    Calculates and prints the most common month, day of week, and hour
+    from the provided bikeshare data.
+
+    Args:
+        df (pandas.DataFrame): Bikeshare data containing month, day_of_week, and hour columns
+    """
     print('\nCalculating Most Frequent Times of Travel...\n')
     start_time = time.time()
 
@@ -64,7 +95,14 @@ def time_stats(df):
 
 
 def station_stats(df):
-    """Display statistics on most popular stations and trip."""
+    """Display statistics on the most popular stations and trip.
+
+    Calculates and prints the most common start station, end station,
+    and start/end station combination from the provided bikeshare data.
+
+    Args:
+        df (pandas.DataFrame): Bikeshare data containing Start Station and End Station columns
+    """
     print('\nCalculating Most Popular Stations and Trip...\n')
     start_time = time.time()
 
@@ -82,7 +120,14 @@ def station_stats(df):
 
 
 def trip_duration_stats(df):
-    """Display statistics on trip duration."""
+    """Display statistics on the total and average trip duration.
+
+    Calculates and prints the total and mean trip duration in a
+    human-readable format (days, hours, minutes, seconds).
+
+    Args:
+        df (pandas.DataFrame): Bikeshare data containing Trip Duration column in seconds
+    """
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
 
@@ -105,7 +150,15 @@ def trip_duration_stats(df):
 
 
 def user_stats(df):
-    """Display statistics on bikeshare users."""
+    """Display statistics on bikeshare users.
+
+    Calculates and prints counts of user types, gender distribution (if available),
+    and birth year statistics (if available) from the provided bikeshare data.
+
+    Args:
+        df (pandas.DataFrame): Bikeshare data containing User Type column and
+            optionally Gender and Birth Year columns
+    """
     print('\nCalculating User Stats...\n')
     start_time = time.time()
 
@@ -139,11 +192,41 @@ def user_stats(df):
     print('-'*40)
 
 
+def display_raw_data(df):
+    """Display raw data in chunks of 5 rows upon user request.
+
+    Continuously prompts the user if they want to see 5 more rows of raw data
+    until they decline or all data has been displayed.
+
+    Args:
+        df (pandas.DataFrame): Bikeshare data to display
+    """
+    start_idx = 0
+    chunk_size = 5
+
+    while start_idx < len(df):
+        show_data = input('\nWould you like to see 5 rows of raw data? Enter yes/no.\n')
+        if show_data.lower() != 'yes':
+            break
+
+        end_idx = min(start_idx + chunk_size, len(df))
+        print(df.iloc[start_idx:end_idx])
+        start_idx = end_idx
+
+        if start_idx >= len(df):
+            print('\nNo more data to display.')
+
+
 def main():
+    """Execute the main program loop for bikeshare data analysis.
+
+    Prompts user for filters, loads and analyzes data, displays statistics,
+    and allows the user to restart the analysis with different filters.
+    """
     while True:
         city, month, day = get_filters()
         df = load_data(city, month, day)
-
+        display_raw_data(df)
         time_stats(df)
         station_stats(df)
         trip_duration_stats(df)
